@@ -1,34 +1,48 @@
-from flask import Flask, request, jsonify
-from vigenere import vigenere_encrypt
-from crypto_utils import aes_encrypt, sha256_hash
-from attack_demo import caesar_decrypt, looks_like_english
-app = Flask(__name__)
-@app.route('/process', methods=['POST'])
-def process_message():
+from flask import Flask, render_template, request, jsonify
+from Crypto.Cipher import AES
+import hashlib
+import base64
+import string
+
+app = Flask(__name__, template_folder='templates', static_folder='static')
+AES_KEY = b'Sixteen byte key' # 16 bytes for AES-128
+def vigenere_encrypt(plaintext, key):
+    alphabet = string.ascii_uppercase
+    plaintext, key = plaintext.upper(), key.upper()
+    encrypted, key_idx = "", 0
+    for char in plaintext:
+        if char in alphabet:
+            p_idx = alphabet.index(char)
+            k_idx = alphabet.index(key[key_idx % len(key)])
+            encrypted += alphabet[(p_idx + k_idx) % 26]
+            key_idx += 1
+        else:
+            encrypted += char
+    return encrypted
+def aes_encrypt(message):
+    cipher = AES.new(AES_KEY, AES.MODE_EAX)
+    ciphertext, tag = cipher.encrypt_and_digest(message.encode())
+    return base64.b64encode(cipher.nonce + ciphertext).decode()
+def sha256_hash(message):
+    return hashlib.sha256(message.encode()).hexdigest()
+# --- Routes ---
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/encrypt', methods=['POST'])
+def handle_encryption():
     data = request.json
-    original_message = data.get('message')
-    vigenere_key = data.get('key', 'KEY') 
-    # 1. Classical Layer: Vigenere Encryption
-    vigenere_ciphertext = vigenere_encrypt(original_message, vigenere_key)
-    # 2. Modern Layer: AES Encryption (encrypting the Vigenere output)
-    final_aes_ciphertext = aes_encrypt(vigenere_ciphertext)
-    # 3. Integrity: SHA-256 Hash of the original message
-    message_hash = sha256_hash(original_message)
+    msg = data.get('message', '')
+    key = data.get('key', 'KEY')
+    v_out = vigenere_encrypt(msg, key)
+    a_out = aes_encrypt(v_out)
+    h_out = sha256_hash(msg)
     return jsonify({
-        "original": original_message,
-        "vigenere_step": vigenere_ciphertext,
-        "aes_final": final_aes_ciphertext,
-        "hash": message_hash
+        "vigenere": v_out,
+        "aes": a_out,
+        "hash": h_out
     })
-@app.route('/demo-attack', methods=['POST'])
-def demo_attack():
-    data = request.json
-    ciphertext = data.get('ciphertext', 'KHOOR ZRUOG')
-    results = []
-    for shift in range(1, 26):
-        decrypted = caesar_decrypt(ciphertext, shift)
-        is_possible = looks_like_english(decrypted)
-        results.append({"shift": shift, "text": decrypted, "possible": is_possible})
-    return jsonify({"attack_results": results})
-if __name__ == "__main__":
-    app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

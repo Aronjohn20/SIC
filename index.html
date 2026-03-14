@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIC - Strategic Information Cryptography</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="container">
+        <header>
+            <div class="logo">SIC</div>
+            <h1>Strategic Information Cryptography</h1>
+            <p class="subtitle">Demonstrating Classical & Modern Encryption</p>
+        </header>
+
+        <main>
+            <section class="card input-section">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="lock"></i></span>
+                    <h2>Message Configuration</h2>
+                </div>
+                <div class="input-group">
+                    <label for="message">Secure Message</label>
+                    <textarea id="message" placeholder="Enter the message you want to encrypt..."></textarea>
+                </div>
+                <div class="controls">
+                    <div class="control-item">
+                        <label for="caesarShift">Caesar Shift (0-25)</label>
+                        <div class="custom-stepper">
+                            <button type="button" class="stepper-btn" id="decrementShift" aria-label="Decrease shift">
+                                <i data-lucide="minus"></i>
+                            </button>
+                            <input type="number" id="caesarShift" value="3" min="0" max="25" readonly>
+                            <button type="button" class="stepper-btn" id="incrementShift" aria-label="Increase shift">
+                                <i data-lucide="plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="control-item">
+                        <label for="vigenereKey">Vigenère Key</label>
+                        <input type="text" id="vigenereKey" value="KEY" placeholder="Key">
+                    </div>
+                </div>
+                <button id="encryptBtn" class="primary-btn">Encrypt & Hash Everything</button>
+            </section>
+
+            <div class="results-grid">
+                <section class="card result-card">
+                    <div class="card-header">
+                        <span class="icon"><i data-lucide="scroll"></i></span>
+                        <h3>Classical Ciphers</h3>
+                    </div>
+                    <div class="result-group">
+                        <label>Caesar Cipher Output</label>
+                        <div id="caesarOutput" class="output-box">Waiting for input...</div>
+                        <button class="copy-btn" data-target="caesarOutput"><i data-lucide="copy"></i></button>
+                    </div>
+                    <div class="result-group">
+                        <label>Vigenère Cipher Output</label>
+                        <div id="vigenereOutput" class="output-box">Waiting for input...</div>
+                        <button class="copy-btn" data-target="vigenereOutput"><i data-lucide="copy"></i></button>
+                    </div>
+                </section>
+
+                <section class="card result-card">
+                    <div class="card-header">
+                        <span class="icon"><i data-lucide="shield-check"></i></span>
+                        <h3>Modern & Integrity</h3>
+                    </div>
+                    <div class="result-group">
+                        <label>AES-GCM (256-bit)</label>
+                        <div id="aesOutput" class="output-box break-all">Waiting for input...</div>
+                        <button class="copy-btn" data-target="aesOutput"><i data-lucide="copy"></i></button>
+                    </div>
+                    <div class="result-group">
+                        <label>SHA-256 Hash</label>
+                        <div id="shaOutput" class="output-box break-all">Waiting for input...</div>
+                        <button class="copy-btn" data-target="shaOutput"><i data-lucide="copy"></i></button>
+                    </div>
+                </section>
+            </div>
+
+            <section class="card attack-section">
+                <div class="card-header">
+                    <span class="icon"><i data-lucide="zap"></i></span>
+                    <h3>Security Analysis: Caesar Brute Force Attack</h3>
+                </div>
+                <p class="description">Classical ciphers like Caesar are vulnerable to brute-force attacks because they have a small key space (only 25 possible shifts). Modern cryptography systems like AES have trillions of combinations, making brute-force impossible with current technology.</p>
+                <div class="attack-controls">
+                    <button id="runAttack" class="secondary-btn">Intercept & Run Attack</button>
+                </div>
+                <div id="attackResults" class="attack-results-container">
+                    <div class="attack-header">
+                        <span>Shift</span>
+                        <span>Possible Plaintext</span>
+                        <span>Confidence</span>
+                    </div>
+                    <div id="attackList" class="attack-list">
+                        <!-- Dynamic results will appear here -->
+                        <div class="empty-state">No attack results yet.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Security In Computing Project — Classic Cipher + Modern Encryption Hybrid Tool</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
